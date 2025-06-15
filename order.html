@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order Moi Moi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff8f0;
+      padding: 20px;
+    }
+    form {
+      max-width: 500px;
+      margin: auto;
+      background: #fefefe;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #3eb51d;
+      color: white;
+      padding: 12px 20px;
+      margin-top: 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      width: 100%;
+      font-size: 1em;
+    }
+    button:hover {
+      background-color: #3eb51d;
+    }
+    .whatsapp {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .total {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #3eb51d;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">Order Your Moi Moi</h2>
+
+  <form action="https://formsubmit.co/moimoigbagada@gmail.com" method="POST" id="orderForm">
+    <!-- Replace YOUR_EMAIL_HERE with your real email -->
+
+    <label for="name">Full Name</label>
+    <input type="text" name="name" required />
+
+    <label for="phone">Phone Number</label>
+    <input type="tel" name="phone" required />
+
+    <label for="address">Delivery Address</label>
+    <textarea name="address" rows="3" required></textarea>
+
+    <label for="type">Type of Moi Moi</label>
+    <select name="type" id="type" required>
+      <option value="">-- Select --</option>
+      <option value="Plain">Plain - ₦800</option>
+      <option value="With Egg">With Egg - ₦1000</option>
+      <option value="With Fish">With Fish - ₦1000</option>
+    </select>
+
+    <label for="quantity">Quantity</label>
+    <input
+      type="number"
+      name="quantity"
+      id="quantity"
+      min="1"
+      value="1"
+      required
+    />
+
+    <label for="delivery">Delivery or Pickup?</label>
+    <select name="delivery" id="delivery" required>
+      <option value="Delivery">Delivery</option>
+      <option value="Pickup">Pickup</option>
+    </select>
+
+    <div class="total" id="totalPrice">Total: ₦0</div>
+
+    <button type="submit">Submit Order</button>
+
+    <!-- Formsubmit settings -->
+    <input type="hidden" name="_subject" value="New Moi Moi Order!" />
+    <input type="hidden" name="_next" value="thankyou.html" />
+  </form>
+
+  <div class="whatsapp">
+    <p>Or order via WhatsApp:</p>
+    <button
+      id="whatsappBtn"
+      style="background-color: green; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer;"
+    >
+      Order on WhatsApp
+    </button>
+  </div>
+
+  <script>
+    const prices = {
+      Plain: 800,
+      "With Egg": 1000,
+      "With Fish": 1000,
+    };
+
+    const DELIVERY_FEE = 500; // ₦200 delivery fee
+
+    const typeSelect = document.getElementById("type");
+    const quantityInput = document.getElementById("quantity");
+    const deliverySelect = document.getElementById("delivery");
+    const totalPriceDiv = document.getElementById("totalPrice");
+
+    function updateTotal() {
+      const selectedType = typeSelect.value;
+      const quantity = parseInt(quantityInput.value) || 0;
+      const deliveryOption = deliverySelect.value;
+
+      let deliveryFee = 0;
+      if (deliveryOption === "Delivery") {
+        deliveryFee = DELIVERY_FEE;
+      }
+
+      if (selectedType && quantity > 0) {
+        const total = prices[selectedType] * quantity + deliveryFee;
+        totalPriceDiv.textContent = `Total: ₦${total.toLocaleString()}` + (deliveryFee > 0 ? ` (Includes ₦${DELIVERY_FEE} delivery fee)` : '');
+      } else {
+        totalPriceDiv.textContent = "Total: ₦0";
+      }
+    }
+
+    typeSelect.addEventListener("change", updateTotal);
+    quantityInput.addEventListener("input", updateTotal);
+    deliverySelect.addEventListener("change", updateTotal);
+
+    // Initialize total on page load
+    updateTotal();
+
+    // WhatsApp order button logic
+    const whatsappBtn = document.getElementById("whatsappBtn");
+
+    whatsappBtn.addEventListener("click", () => {
+      const name = document.querySelector('input[name="name"]').value.trim();
+      const phone = document.querySelector('input[name="phone"]').value.trim();
+      const address = document.querySelector('textarea[name="address"]').value.trim();
+      const type = typeSelect.value;
+      const quantity = quantityInput.value;
+      const delivery = deliverySelect.value;
+      const totalText = totalPriceDiv.textContent.replace("Total: ", "");
+
+      if (!name || !phone || !address || !type || !quantity) {
+        alert("Please fill all the fields before ordering on WhatsApp.");
+        return;
+      }
+
+      const message = `Hello! I would like to order:\n- Moi Moi Type: ${type}\n- Quantity: ${quantity}\n- Delivery option: ${delivery}\n- Total Price: ${totalText}\n\nName: ${name}\nPhone: ${phone}\nAddress: ${address}`;
+
+      const encodedMessage = encodeURIComponent(message);
+
+      // Replace with your WhatsApp number in international format, no + sign, no spaces
+      const whatsappNumber = "234XXXXXXXXXX";
+
+      const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+      window.open(whatsappURL, "_blank");
+    });
+  </script>
+</body>
+</html>
